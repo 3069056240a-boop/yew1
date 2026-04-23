@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>杨京超 - 个人主页</title>
+    <!-- 引入 Tailwind CSS 进行极速排版 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 自定义深空背景色与背景图 */
+        body {
+            background-color: #060e17; 
+            color: #d1d5db;
+            background-image: url('./images/顶部背景图.png');
+            background-attachment: fixed;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-size: 100% 60vh;
+        }
+        /* 星星闪烁动画 */
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle infinite alternate;
+            opacity: 0.4;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.1; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        /* 页面切换动画 */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === 1. 优化后的 Google 四色环形导航 === */
+        .radial-sector {
+            fill: rgba(255, 255, 255, 0.08); /* 默认半透明灰色，告别死黑 */
+            stroke: #060e17;
+            stroke-width: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        /* Google 蓝 - 主页 */
+        .radial-sector[data-tab="home"].active, .radial-sector[data-tab="home"]:hover { fill: #4285F4; filter: drop-shadow(0 0 8px #4285F4); }
+        /* Google 红 - 服务 */
+        .radial-sector[data-tab="services"].active, .radial-sector[data-tab="services"]:hover { fill: #EA4335; filter: drop-shadow(0 0 8px #EA4335); }
+        /* Google 黄 - 证书 */
+        .radial-sector[data-tab="certs"].active, .radial-sector[data-tab="certs"]:hover { fill: #FBBC05; filter: drop-shadow(0 0 8px #FBBC05); }
+        /* Google 绿 - 推荐 */
+        .radial-sector[data-tab="recs"].active, .radial-sector[data-tab="recs"]:hover { fill: #34A853; filter: drop-shadow(0 0 8px #34A853); }
+
+        /* === 2. True Focus 文字闪烁效果 === */
+        .true-focus-heading {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem 0.125rem;
+        }
+        .true-focus-heading .char {
+            opacity: 0;
+            animation: trueFocus 0.5s ease-in-out forwards;
+        }
+        @keyframes trueFocus {
+            0% { opacity: 0; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.1); color: #6ee7b7; }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* === 3. 飞扬海报 (Flying Posters) 核心 3D 样式 === */
+        .flying-container {
+            perspective: 1200px; /* 开启 3D 空间感 */
+            scrollbar-width: none; /* 隐藏火狐滚动条 */
+            -ms-overflow-style: none; /* 隐藏 IE 滚动条 */
+        }
+        .flying-container::-webkit-scrollbar {
+            display: none; /* 隐藏 Chrome 滚动条 */
+        }
+        .flying-track {
+            transform-style: preserve-3d;
+        }
+        .flying-item {
+            transform-style: preserve-3d;
+            transform-origin: center center;
+            will-change: transform, opacity;
+            transition: transform 0.1s ease-out, opacity 0.1s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* 证书弹出大图的样式 */
+        #cert-lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            padding: 1rem;
+        }
+        #cert-lightbox.show { display: flex; }
+
+        /* === 宝藏博主 3D 环形旋转木马 === */
+        .carousel-container {
+            perspective: 1200px;
+            height: 320px;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-ring {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            transform-style: preserve-3d;
+            animation: rotateRing 20s linear infinite;
+        }
+        .carousel-ring:hover {
+            animation-play-state: paused;
+        }
+        @keyframes rotateRing {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        .carousel-item {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            left: calc(50% - 100px);
+            top: calc(50% - 100px);
+            backface-visibility: hidden;
+            cursor: pointer;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .carousel-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 20px 60px rgba(110, 231, 183, 0.4);
+            border-color: rgba(110, 231, 183, 0.6);
+        }
+
+        /* 图片放大 Lightbox */
+        #image-lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 2rem;
+        }
+        #image-lightbox.show { display: flex; }
+        #image-lightbox img {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 16px;
+            box-shadow: 0 0 80px rgba(110, 231, 183, 0.3);
+        }
+
+        /* 实用网站 / 学习资源 卡片 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(110, 231, 183, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden font-sans bg-[#060e17]">
+
+    <!-- 动态星空背景层 -->
+    <div id="star-container" class="fixed inset-0 z-0 pointer-events-none"></div>
+
+    <!-- 💡 右上角：修复后的环形菜单 (Radial Menu) -->
+    <!-- 调整了大小，固定在角落，不会遮挡任何内容 -->
+    <div id="radial-menu" class="fixed top-6 right-4 md:top-8 md:right-8 z-50 w-20 h-20 md:w-28 md:h-28 drop-shadow-2xl">
+        <svg viewBox="0 0 200 200" class="w-full h-full">
+            <path class="radial-sector" data-tab="home" onclick="switchTab('home')" d="M71.72 71.72 A40 40 0 0 1 128.28 71.72 L149.5 50.5 A70 70 0 0 0 50.5 50.5 Z" />
+            <path class="radial-sector" data-tab="services" onclick="switchTab('services')" d="M128.28 71.72 A40 40 0 0 1 128.28 128.28 L149.5 149.5 A70 70 0 0 0 149.5 50.5 Z" />
+            <path class="radial-sector" data-tab="certs" onclick="switchTab('certs')" d="M128.28 128.28 A40 40 0 0 1 71.72 128.28 L50.5 149.5 A70 70 0 0 0 149.5 149.5 Z" />
+            <path class="radial-sector" data-tab="recs" onclick="switchTab('recs')" d="M71.72 128.28 A40 40 0 0 1 71.72 71.72 L50.5 50.5 A70 70 0 0 0 50.5 149.5 Z" />
+            <!-- 中心的圆，深色半透明，不突兀 -->
+            <circle cx="100" cy="100" r="34" fill="rgba(6, 14, 23, 0.9)" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+        </svg>
+        <div id="radial-center-label" class="absolute inset-0 flex items-center justify-center text-[10px] md:text-xs font-bold text-white pointer-events-none transition-colors duration-300">主页</div>
+    </div>
+
+    <!-- 居中悬浮容器 -->
+    <div class="max-w-[1400px] mx-auto w-full flex flex-col md:flex-row gap-8 px-4 sm:px-8 md:px-12 py-10 relative z-10 min-h-screen">
+        
+        <!-- 左侧：个人名片区 -->
+        <div class="w-full md:w-[320px] flex-shrink-0 flex flex-col justify-between h-fit md:sticky md:top-10 md:h-auto">
+            <aside class="bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col p-5 md:py-10 md:px-6 shadow-2xl">
+                <!-- 顶部信息区：头像 + 名字签名 -->
+                <div class="flex flex-row md:flex-col items-center gap-4 md:gap-0 mb-4 md:mb-6">
+                    <div class="relative w-16 h-16 md:w-28 md:h-28 group cursor-pointer">
+                        <div class="absolute inset-0 bg-gradient-to-tr from-teal-400 to-blue-500 rounded-full animate-pulse blur-md opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                        <img src="./images/头像.png" alt="杨京超头像" class="relative w-full h-full object-cover rounded-full border-2 border-slate-700">
+                    </div>
+                    <div class="text-left md:text-center">
+                        <h1 class="text-xl md:text-2xl font-bold text-white tracking-wider mb-2">杨京超</h1>
+                        <p class="text-sm text-gray-400 leading-relaxed">
+                            "用 AI 工具放大生产力<br>做持续进化的终身学习者"
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 分割线 (桌面端显示) -->
+                <div class="hidden md:block w-full h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mb-6"></div>
+
+                <!-- 社交/联系图标 (桌面端显示) -->
+                <div class="hidden md:flex gap-4 mb-8">
+                    <div onclick="alert('我的微信与手机号同号：15227717327\n期待您的交流！')" class="p-2 bg-[#162032] rounded-full hover:bg-teal-500 hover:text-white cursor-pointer transition-colors text-gray-400" title="微信: 15227717327">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.5,13.5c-0.6,0-1-0.4-1-1s0.4-1,1-1s1,0.4,1,1S9.1,13.5,8.5,13.5z M12.5,11.5c-0.6,0-1,0.4-1,1s0.4,1,1,1s1-0.4,1-1 S13.1,11.5,12.5,11.5z M24,11c0-4.4-4.3-8-9.5-8S5,6.6,5,11c0,2.5,1.4,4.7,3.6,6.1c-0.2,0.6-0.6,1.9-0.6,1.9 c-0.1,0.3,0.1,0.4,0.3,0.3c0,0,2.3-1.1,3.4-1.7c0.9,0.2,1.8,0.4,2.8,0.4C19.7,19,24,15.4,24,11z"/></svg>
+                    </div>
+                    <a href="tel:15227717327" class="p-2 bg-[#162032] rounded-full hover:bg-blue-500 hover:text-white cursor-pointer transition-colors text-gray-400" title="电话: 15227717327">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                    </a>
+                    <a href="mailto:202595063111@stu.qlu.edu.cn" class="p-2 bg-[#162032] rounded-full hover:bg-rose-500 hover:text-white cursor-pointer transition-colors text-gray-400" title="发送邮件">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    </a>
+                </div>
+
+                <!-- 基础信息列表 (桌面端显示) -->
+                <div class="hidden md:block w-full text-sm text-gray-400 space-y-4 px-2">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <span>毕业院校</span>
+                        <span class="text-gray-200 font-medium">齐鲁工业大学</span>
+                    </div>
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                        <span>专业年级</span>
+                        <span class="text-gray-200 font-medium">大一食品专业</span>
+                    </div>
+                    <div class="border-b border-slate-800 pb-2">
+                        <p class="text-white font-semibold text-base leading-snug">“主动才有可能”</p>
+                        <p class="text-xs text-slate-400 mt-1">行动力胜于等待</p>
+                    </div>
+                </div>
+
+                <!-- 联系按钮 -->
+                <button id="contact-btn" onclick="revealContact()" class="block text-center mt-4 md:mt-auto w-full py-2 md:py-3 text-sm md:text-base bg-gradient-to-r from-[#ff6b6b] to-[#ff4757] text-white rounded-full font-bold tracking-widest hover:shadow-lg hover:shadow-rose-500/30 hover:-translate-y-1 transition-all duration-300">
+                    联系我
+                </button>
+            </aside>
+
+            <!-- 底部信息 -->
+            <footer class="text-left text-xs text-gray-600 mt-8 pb-4 md:mt-auto">
+                <p>© 2026 Yang Jingchao.</p>
+                <p class="mt-1">Qilu University.</p>
+            </footer>
+        </div>
+
+        <!-- ==================================== -->
+        <!-- 右侧主内容区 -->
+        <main class="flex-1 pb-20">
+
+            <!-- 页面 1：主页 / 项目 (Home) -->
+            <div id="tab-home" class="tab-content active">
+                <div class="mb-10">
+                    <!-- 💡 pr-24 确保文字不会和右上角的环形菜单重叠 -->
+                    <h2 class="text-3xl md:text-4xl pr-24 md:pr-32 font-bold text-white mb-3 true-focus-heading" data-text="Hello, I'm Yang Jingchao"></h2>
+                    <p class="text-gray-400">探索科技与创意的边界，用 AI 赋能日常与工作。</p>
+                </div>
+                <!-- 项目卡片网格 -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="group bg-[#111c2e] rounded-xl overflow-hidden border border-[#1e2a40] hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="AIGC">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#111c2e] to-transparent"></div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs font-bold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full">内容创作</span>
+                                <span class="text-xs font-mono text-gray-500">Midjourney / Gemini</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-100 mb-2">AIGC 自动化图文矩阵</h3>
+                            <p class="text-sm text-gray-400 leading-relaxed">完成浪尖社区专项培训，生成高质量宣传海报与脚本，大幅缩短物料制作周期，形成标准化内容生产 SOP。</p>
+                        </div>
+                    </div>
+                    <div class="group bg-[#111c2e] rounded-xl overflow-hidden border border-[#1e2a40] hover:-translate-y-2 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300">
+                        <div class="h-48 overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Agent">
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#111c2e] to-transparent"></div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs font-bold text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full">工作流引擎</span>
+                                <span class="text-xs font-mono text-gray-500">Trae CN / 讯飞</span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-100 mb-2">智能体开发与流测试</h3>
+                            <p class="text-sm text-gray-400 leading-relaxed">基于 AI 编程逻辑与科大讯飞大模型平台，测试并搭建初步的数字化提效工具与专属智能体对话流。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 页面 2：校园服务 (Campus Services) -->
+            <div id="tab-services" class="tab-content">
+                <div class="mb-10">
+                    <h2 class="text-3xl md:text-4xl pr-24 md:pr-32 font-bold text-white mb-3 true-focus-heading" data-text="校园服务 Services"></h2>
+                    <p class="text-gray-400">结合我的实践经验，为您提供靠谱的校园代办与咨询服务。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-gradient-to-br from-[#0f172a] to-[#020617] p-8 rounded-2xl border border-blue-500/20 relative overflow-hidden group flex flex-col items-start">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <svg class="w-24 h-24 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-blue-400 mb-2">电脑数码选购指导</h3>
+                        <p class="text-xs text-blue-300/50 mb-6 font-mono">四川星辰科技公司 · 官方授权代理</p>
+                        <p class="text-sm text-gray-300 mb-6 leading-relaxed flex-1">
+                            作为星辰科技销售助理，系统掌握了各类电脑数码产品的参数与核心卖点。提供：<br>
+                            ✅ 结合专业的大学生避坑购机指南<br>
+                            ✅ 高性价比笔记本/台式机推荐与代购<br>
+                            ✅ 基础软硬件装机与排障咨询
+                        </p>
+                        <a href="tel:15227717327" class="inline-block px-6 py-2 bg-blue-500/20 text-blue-400 rounded-full text-sm font-bold border border-blue-500/30 hover:bg-blue-500 hover:text-white transition-colors">
+                            📞 联系咨询 (微信同号)
+                        </a>
+                    </div>
+                    <div class="bg-gradient-to-br from-[#0f172a] to-[#020617] p-8 rounded-2xl border border-green-500/20 relative overflow-hidden group flex flex-col items-start">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <svg class="w-24 h-24 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-green-400 mb-2">新东方雅思课程咨询</h3>
+                        <p class="text-xs text-green-300/50 mb-6 font-mono">新东方官方校园大使</p>
+                        <p class="text-sm text-gray-300 mb-6 leading-relaxed flex-1">
+                            无论您是准备出国留学、考研复试，还是提升个人英语竞争力，我都能为您提供：<br>
+                            ✅ 新东方最新雅思/托福课程内部资料<br>
+                            ✅ 校园大使专属报名福利与学费折扣<br>
+                            ✅ 备考规划与真实上岸经验分享
+                        </p>
+                        <a href="tel:15227717327" class="inline-block px-6 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-bold border border-green-500/30 hover:bg-green-500 hover:text-white transition-colors">
+                            📞 获取优惠 (微信同号)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 页面 3：技能证书 🚀【飞扬海报特效版】🚀 -->
+            <div id="tab-certs" class="tab-content">
+                <div class="mb-6">
+                    <h2 class="text-3xl md:text-4xl pr-24 md:pr-32 font-bold text-white mb-3 true-focus-heading" data-text="技能相册 Certificates"></h2>
+                    <p class="text-gray-400">滑动滚轮，体验 3D 飞扬海报档案库。（点击可放大）</p>
+                </div>
+
+                <!-- 核心容器：限制高度，开启 3D 透视，右侧预留环形菜单空间 -->
+                <div id="flying-container" class="flying-container relative w-full h-[60vh] md:h-[650px] overflow-y-auto overflow-x-hidden rounded-[2rem] border border-white/10 bg-slate-900/30 backdrop-blur-md shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] pr-12 sm:pr-16 md:pr-0">
+                    
+                    <!-- 滚动轨道：上下留出空白，确保证书能滚动到屏幕正中央 -->
+                    <div class="flying-track py-[30vh] md:py-[35vh] flex flex-col items-center gap-10 md:gap-16">
+                        
+                        <!-- 证书卡片 1 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/人工智能训练师（高级）-杨京超-20260204.jpg" data-title="阿里达摩院" data-subtitle="人工智能训练师高级证书">
+                            <img src="./images/人工智能训练师（高级）-杨京超-20260204.jpg" class="w-full h-full object-cover bg-gray-900" alt="达摩院证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">阿里达摩院</h4>
+                                <p class="text-blue-400 text-sm">人工智能训练师高级证书</p>
+                            </div>
+                        </div>
+
+                        <!-- 证书卡片 2 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/阿里云PAI的AIGC证书.png" data-title="阿里云" data-subtitle="大模型 Clouder 认证">
+                            <img src="./images/阿里云PAI的AIGC证书.png" class="w-full h-full object-cover bg-gray-900" alt="阿里云证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">阿里云</h4>
+                                <p class="text-blue-400 text-sm">大模型 Clouder 认证</p>
+                            </div>
+                        </div>
+
+                        <!-- 证书卡片 3 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/讯飞智能体证书.png" data-title="科大讯飞" data-subtitle="智能体 / Prompt 工程师认证">
+                            <img src="./images/讯飞智能体证书.png" class="w-full h-full object-cover bg-gray-900" alt="讯飞证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">科大讯飞</h4>
+                                <p class="text-blue-400 text-sm">智能体 / Prompt 工程师认证</p>
+                            </div>
+                        </div>
+
+                        <!-- 证书卡片 4 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/RAG应用证书（搭建导购网站）.png" data-title="RAG 应用" data-subtitle="综合赛二等奖">
+                            <img src="./images/RAG应用证书（搭建导购网站）.png" class="w-full h-full object-cover bg-gray-900" alt="RAG证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">RAG 应用</h4>
+                                <p class="text-blue-400 text-sm">综合赛二等奖</p>
+                            </div>
+                        </div>
+
+                        <!-- 证书卡片 5 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/人工智能训练师（初级）-杨京超-20260203.jpg" data-title="人工智能训练师（初级）" data-subtitle="人工智能训练师（初级）-杨京超-20260203.jpg">
+                            <img src="./images/人工智能训练师（初级）-杨京超-20260203.jpg" class="w-full h-full object-cover bg-gray-900" alt="证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">人工智能训练师（初级）</h4>
+                                <p class="text-blue-400 text-sm">人工智能训练师（初级）-杨京超-20260203.jpg</p>
+                            </div>
+                        </div>
+
+                        <!-- 证书卡片 6 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/讯飞提示词证书.png" data-title="讯飞提示词证书" data-subtitle="讯飞提示词证书.png">
+                            <img src="./images/讯飞提示词证书.png" class="w-full h-full object-cover bg-gray-900" alt="证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">讯飞提示词证书</h4>
+                                <p class="text-blue-400 text-sm">讯飞提示词证书.png</p>
+                            </div>
+                        </div>
+
+                        <!-- 证书卡片 7 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/讯飞模型微调证书.png" data-title="讯飞模型微调证书" data-subtitle="讯飞模型微调证书.png">
+                            <img src="./images/讯飞模型微调证书.png" class="w-full h-full object-cover bg-gray-900" alt="证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">讯飞模型微调证书</h4>
+                                <p class="text-blue-400 text-sm">讯飞模型微调证书.png</p>
+                            </div>
+                        </div>
+
+                        <!-- 证书卡片 8 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/阿里云提示词证书.png" data-title="阿里云提示词证书" data-subtitle="阿里云提示词证书.png">
+                            <img src="./images/阿里云提示词证书.png" class="w-full h-full object-cover bg-gray-900" alt="证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">阿里云提示词证书</h4>
+                                <p class="text-blue-400 text-sm">阿里云提示词证书.png</p>
+                            </div>
+                        </div>
+
+                        <!-- 证书卡片 9 -->
+                        <div class="flying-item relative w-[85%] md:w-[500px] h-[240px] md:h-[340px] rounded-[24px] border border-white/10 overflow-hidden cursor-pointer shadow-2xl" onclick="showLightbox(this)" data-image="./images/阿里云智能体证书.png" data-title="阿里云智能体证书" data-subtitle="阿里云智能体证书.png">
+                            <img src="./images/阿里云智能体证书.png" class="w-full h-full object-cover bg-gray-900" alt="证书">
+                            <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5">
+                                <h4 class="text-white font-bold text-lg">阿里云智能体证书</h4>
+                                <p class="text-blue-400 text-sm">阿里云智能体证书.png</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 弹出的证书大图 (Lightbox) -->
+                <div id="cert-lightbox" onclick="closeLightbox(event)">
+                    <div class="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl bg-[#020617] border border-white/10 shadow-2xl" onclick="event.stopPropagation()">
+                        <button onclick="closeLightbox(event, true)" class="absolute top-4 right-4 z-10 rounded-full bg-white/10 text-white w-10 h-10 flex items-center justify-center hover:bg-white/20 transition-colors">×</button>
+                        <img id="cert-lightbox-img" src="" alt="证书大图" class="w-full h-[70vh] md:h-[80vh] object-contain bg-black/50" />
+                        <div id="cert-lightbox-caption" class="absolute bottom-0 left-0 right-0 bg-black/80 px-5 py-4 text-sm font-bold text-white text-center"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 页面 4：个人推荐 (Recommendations) -->
+            <div id="tab-recs" class="tab-content">
+                <div class="mb-10">
+                    <h2 class="text-3xl md:text-4xl pr-24 md:pr-32 font-bold text-white mb-3 true-focus-heading" data-text="个人推荐 Favorites"></h2>
+                    <p class="text-gray-400">收录那些让我获益匪浅的宝藏博主、实用工具与学习资源。</p>
+                </div>
+
+                <!-- 宝藏博主 - 3D 环形旋转木马 -->
+                <section class="mb-12">
+                    <h3 class="section-title mb-6 flex items-center gap-3">
+                        <span class="text-2xl">🌟</span> 宝藏博主推荐
+                    </h3>
+                    <div class="carousel-container">
+                        <div class="carousel-ring" id="blogger-carousel">
+                            <div class="carousel-item" onclick="showImageLightbox(this)" data-src="./images/抖音浩源大学生成长认知.png">
+                                <img src="./images/抖音浩源大学生成长认知.png" alt="浩源大学生成长认知">
+                            </div>
+                            <div class="carousel-item" onclick="showImageLightbox(this)" data-src="./images/抖音锡峰ai计算机.png">
+                                <img src="./images/抖音锡峰ai计算机.png" alt="锡峰AI计算机">
+                            </div>
+                            <div class="carousel-item" onclick="showImageLightbox(this)" data-src="./images/抖音阿文实习求职.png">
+                                <img src="./images/抖音阿文实习求职.png" alt="阿文实习求职">
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-center text-gray-500 text-sm mt-2">🎠 鼠标悬停暂停 · 点击放大图片</p>
+                </section>
+
+            </div>
+
+            <!-- 图片放大 Lightbox -->
+            <div id="image-lightbox" onclick="closeImageLightbox()">
+                <img id="lightbox-img" src="" alt="放大图片">
+            </div>
+
+        </main>
+    </div>
+
+    <!-- 底部暗角遮罩 -->
+    <div class="fixed bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#040810] to-transparent z-0 pointer-events-none"></div>
+
+    <!-- 粒子连线交互背景 -->
+    <canvas id="particle-canvas" class="fixed bottom-0 left-0 w-full h-full pointer-events-none" style="z-index: 1;"></canvas>
+
+    <!-- 交互逻辑 JS -->
+    <script>
+        // === 1. Google 环形菜单切换逻辑 ===
+        const radialLabels = {
+            home: { label: '主页', color: '#4285F4' },     // Google Blue
+            services: { label: '服务', color: '#EA4335' }, // Google Red
+            certs: { label: '证书', color: '#FBBC05' },    // Google Yellow
+            recs: { label: '推荐', color: '#34A853' },     // Google Green
+        };
+
+        function switchTab(tabId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // 显示目标页面
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            // 更新环形菜单状态
+            document.querySelectorAll('.radial-sector').forEach(path => {
+                path.classList.toggle('active', path.dataset.tab === tabId);
+            });
+            // 更新中心文字和颜色
+            const center = document.getElementById('radial-center-label');
+            const info = radialLabels[tabId];
+            if (center && info) {
+                center.textContent = info.label;
+                center.style.color = info.color;
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // === 2. True Focus 文字拆分生成器 ===
+        function initTrueFocus() {
+            const headings = document.querySelectorAll('.true-focus-heading');
+            headings.forEach(heading => {
+                const text = heading.dataset.text;
+                if (!text) return;
+                heading.innerHTML = ''; // 清空原有内容
+                // 将句子拆分成单个字符包裹，制造跑马灯对焦效果
+                text.split('').forEach((char, index) => {
+                    const span = document.createElement('span');
+                    span.textContent = char === ' ' ? '\u00A0' : char; // 处理空格
+                    span.classList.add('char');
+                    // 依次延迟触发动画
+                    span.style.animationDelay = `${index * 0.05}s`;
+                    heading.appendChild(span);
+                });
+            });
+        }
+
+        // === 3. 飞扬海报 (Flying Posters) 核心 3D 数学引擎 ===
+        function initFlyingPosters() {
+            const container = document.getElementById('flying-container');
+            const items = document.querySelectorAll('.flying-item');
+            if (!container || items.length === 0) return;
+
+            function update3DPosters() {
+                // 获取容器的垂直正中心位置
+                const containerRect = container.getBoundingClientRect();
+                const containerCenter = containerRect.top + containerRect.height / 2;
+                const maxDist = containerRect.height / 1.5; // 控制变形的力度阈值
+
+                items.forEach(item => {
+                    const itemRect = item.getBoundingClientRect();
+                    const itemCenter = itemRect.top + itemRect.height / 2;
+                    // 计算卡片中心距离容器中心的距离
+                    const dist = itemCenter - containerCenter;
+                    // 将距离转换为 -1 到 1 之间的比例
+                    const ratio = Math.max(-1, Math.min(1, dist / maxDist));
+
+                    // 核心物理引擎：
+                    // ratio 越接近 0 (中心)，rotateX 趋于 0，完全展平。
+                    // ratio 偏离 0，产生翻折 (rotateX) 和景深后退 (translateZ)
+                    const rotateX = ratio * -55; // 翻折角度最大 55 度
+                    const translateZ = Math.abs(ratio) * -300; // 偏离中心向屏幕后方推 300px
+                    const scale = 1 - Math.abs(ratio) * 0.15; // 稍微缩小
+                    const opacity = Math.max(0.2, 1 - Math.abs(ratio) * 0.7); // 边缘变透明
+
+                    // 应用 3D 变换
+                    item.style.transform = `translateZ(${translateZ}px) rotateX(${rotateX}deg) scale(${scale})`;
+                    item.style.opacity = opacity;
+
+                    // 当处于中心位置时，加一点薄荷绿高亮
+                    if (Math.abs(ratio) < 0.15) {
+                        item.style.boxShadow = '0 0 40px rgba(110, 231, 183, 0.4)';
+                        item.style.borderColor = 'rgba(110, 231, 183, 0.8)';
+                        item.style.zIndex = '10';
+                    } else {
+                        item.style.boxShadow = '0 20px 40px rgba(0,0,0,0.6)';
+                        item.style.borderColor = 'rgba(255,255,255,0.1)';
+                        item.style.zIndex = '1';
+                    }
+                });
+            }
+
+            // 绑定滚动事件
+            container.addEventListener('scroll', () => {
+                requestAnimationFrame(update3DPosters);
+            });
+            // 初始执行一次
+            update3DPosters();
+        }
+
+        // === 4. 证书弹窗放大图逻辑 ===
+        function showLightbox(element) {
+            const lightbox = document.getElementById('cert-lightbox');
+            const img = document.getElementById('cert-lightbox-img');
+            const caption = document.getElementById('cert-lightbox-caption');
+            
+            img.src = element.dataset.image;
+            caption.textContent = `${element.dataset.title} — ${element.dataset.subtitle}`;
+            lightbox.classList.add('show');
+        }
+
+        function closeLightbox(event, force = false) {
+            if (force || event.target.id === 'cert-lightbox') {
+                document.getElementById('cert-lightbox').classList.remove('show');
+            }
+        }
+
+        // === 5. 背景星空生成 ===
+        function initStars() {
+            const container = document.getElementById('star-container');
+            for (let i = 0; i < 60; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = star.style.height = `${Math.random() * 3}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(star);
+            }
+        }
+
+        // === 6. 联系我按钮点击显示逻辑 ===
+        function revealContact() {
+            const btn = document.getElementById('contact-btn');
+            if (btn) {
+                btn.outerHTML = `
+                    <a href="tel:15227717327" class="block text-center mt-4 md:mt-auto w-full py-2 md:py-3 text-sm md:text-base bg-gradient-to-r from-[#ff6b6b] to-[#ff4757] text-white rounded-full font-bold tracking-widest hover:shadow-lg hover:shadow-rose-500/30 hover:-translate-y-1 transition-all duration-300 animate-[fadeIn_0.3s_ease-in-out]">
+                        15227717327
+                        <span class="block text-xs font-normal mt-0.5 opacity-90 tracking-normal">👆 点击拨打 (微信同号)</span>
+                    </a>
+                `;
+            }
+        }
+
+        // === 页面加载完毕后初始化所有特效 ===
+        document.addEventListener('DOMContentLoaded', () => {
+            initStars();
+            initTrueFocus();
+            initFlyingPosters();
+            switchTab('home'); // 默认显示主页并点亮 Google 蓝
+            initParticleCanvas(); // 初始化粒子连线交互
+            initCarousel3D(); // 初始化3D环形旋转木马
+        });
+
+        // === 8. 宝藏博主 3D 环形旋转木马 ===
+        function initCarousel3D() {
+            const carousel = document.getElementById('blogger-carousel');
+            if (!carousel) return;
+
+            const items = carousel.querySelectorAll('.carousel-item');
+            const itemCount = items.length;
+            const angleStep = 360 / itemCount;
+            const radius = 400;
+
+            items.forEach((item, index) => {
+                const angle = angleStep * index;
+                const rotateY = angle;
+                const translateZ = radius;
+                const x = Math.cos(angle * Math.PI / 180) * radius;
+                const z = Math.sin(angle * Math.PI / 180) * radius;
+
+                item.style.transform = `rotateY(${rotateY}deg) translateZ(${translateZ}px)`;
+            });
+
+            carousel.addEventListener('click', (e) => {
+                const clickedItem = e.target.closest('.carousel-item');
+                if (clickedItem) {
+                    showImageLightbox(clickedItem);
+                }
+            });
+        }
+
+        // === 9. 图片放大 Lightbox ===
+        function showImageLightbox(element) {
+            const lightbox = document.getElementById('image-lightbox');
+            const img = document.getElementById('lightbox-img');
+            if (!lightbox || !img) return;
+
+            const src = element.dataset.src || element.querySelector('img')?.src;
+            if (src) {
+                img.src = src;
+                lightbox.classList.add('show');
+            }
+        }
+
+        function closeImageLightbox() {
+            const lightbox = document.getElementById('image-lightbox');
+            if (lightbox) {
+                lightbox.classList.remove('show');
+            }
+        }
+
+        // === 7. 粒子连线交互系统 ===
+        function initParticleCanvas() {
+            const canvas = document.getElementById('particle-canvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let mouseX = null;
+            let mouseY = null;
+            const particleCount = 80;
+            const maxDistance = 120;
+            const mouseRadius = 150;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = canvas.height * 0.5 + Math.random() * canvas.height * 0.5;
+                    this.vx = (Math.random() - 0.5) * 0.5;
+                    this.vy = (Math.random() - 0.5) * 0.5;
+                    this.radius = Math.random() * 2 + 1;
+                    this.baseX = this.x;
+                    this.baseY = this.y;
+                }
+
+                update() {
+                    if (mouseX !== null && mouseY !== null) {
+                        const dx = mouseX - this.x;
+                        const dy = mouseY - this.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < mouseRadius) {
+                            const force = (mouseRadius - distance) / mouseRadius;
+                            const angle = Math.atan2(dy, dx);
+                            this.vx += Math.cos(angle) * force * 0.5;
+                            this.vy += Math.sin(angle) * force * 0.5;
+                        }
+                    }
+
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    this.vx *= 0.98;
+                    this.vy *= 0.98;
+
+                    const returnForce = 0.01;
+                    this.vx += (this.baseX - this.x) * returnForce;
+                    this.vy += (this.baseY - this.y) * returnForce;
+
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.y < canvas.height * 0.3) this.y = canvas.height * 0.3;
+                    if (this.y > canvas.height) this.y = canvas.height;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function drawLines() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < maxDistance) {
+                            const opacity = (1 - distance / maxDistance) * 0.3;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                drawLines();
+
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                initParticles();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (e.clientY > canvas.height * 0.3) {
+                    mouseX = e.clientX;
+                    mouseY = e.clientY;
+                } else {
+                    mouseX = null;
+                    mouseY = null;
+                }
+            });
+
+            document.addEventListener('mouseleave', () => {
+                mouseX = null;
+                mouseY = null;
+            });
+
+            resizeCanvas();
+            initParticles();
+            animate();
+        }
+    </script>
+</body>
+</html>
